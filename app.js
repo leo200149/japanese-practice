@@ -204,12 +204,16 @@ const dataService = function(){
 
   function updateWords(){
     words.forEach((word)=>{word.y+=speed});
+    let newWords = [];
     for(let index=0;index<words.length;index++){
       let word = words[index];
       if(keyInIds.indexOf(word.id)==-1&&word.y>=height+20){
         failWords[word.word.key]=word.word;
+      }else{
+        newWords.push(word);
       }
     }
+    words = newWords;
   }
 
   function updateKeyIn(key){
@@ -322,20 +326,24 @@ const uiController = function(dataService){
       for(let i=0;i<japaneseTableTds.length;i++){
         let td = japaneseTableTds[i];
         let tdKey = td.getAttribute("key");
-        let style = td.getAttribute("style");
-        if(key==tdKey&&!style){
-          td.style = "background:#ff6d00"
+        if(key==tdKey&&!td.classList.contains("table-current")&&!td.classList.contains("table-first")){
+          td.classList.add("table-fail");
         }
       }
     }
   }
   function printFirstWord(){
     let firstWord = dataService.getFirstWord();
+    if(firstWord==null){
+      return
+    }
     for(let i=0;i<japaneseTableTds.length;i++){
       let td = japaneseTableTds[i];
       let tdKey = td.getAttribute("key");
       if(tdKey&&firstWord.word.key==tdKey){
-        td.style = "background:orange";
+        td.classList.add("table-first");
+      }else{
+        td.classList.remove("table-first");
       }
     }
   }
@@ -354,9 +362,9 @@ const uiController = function(dataService){
       let td = japaneseTableTds[i];
       let key = td.getAttribute("key");
       if(key==keyIn){
-        td.style = "background:yellow"
+        td.classList.add("table-current");
       }else{
-        td.style = "";
+        td.classList.remove("table-current");
       }
     }
   }
@@ -387,7 +395,7 @@ const uiController = function(dataService){
         dataService.restartData(speed,levelUp,secondWord);
         for(let i=0;i<japaneseTableTds.length;i++){
           let td = japaneseTableTds[i];
-          td.style = "";
+          td.className="";
         }
     });
   }
