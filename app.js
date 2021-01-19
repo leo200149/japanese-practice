@@ -47,6 +47,54 @@ const dataService = function(){
     {w:'を',key:'o'},
     {w:'ん',key:'n'}
   ];
+  const BASE_SECOND_WORDS = [
+    {w:'ア',key:'a'},
+    {w:'イ',key:'i'},
+    {w:'ウ',key:'u'},
+    {w:'エ',key:'e'},
+    {w:'オ',key:'o'},
+    {w:'カ',key:'ka'},
+    {w:'キ',key:'ki'},
+    {w:'ク',key:'ku'},
+    {w:'ケ',key:'ke'},
+    {w:'コ',key:'ko'},
+    {w:'サ',key:'sa'},
+    {w:'シ',key:'si'},
+    {w:'ス',key:'su'},
+    {w:'セ',key:'se'},
+    {w:'ソ',key:'so'},
+    {w:'タ',key:'ta'},
+    {w:'チ',key:'ti'},
+    {w:'ツ',key:'tu'},
+    {w:'テ',key:'te'},
+    {w:'ト',key:'to'},
+    {w:'ナ',key:'na'},
+    {w:'ニ',key:'ni'},
+    {w:'ヌ',key:'nu'},
+    {w:'ネ',key:'ne'},
+    {w:'ノ',key:'no'},
+    {w:'ハ',key:'ha'},
+    {w:'ヒ',key:'hi'},
+    {w:'フ',key:'hu'},
+    {w:'ヘ',key:'he'},
+    {w:'ホ',key:'ho'},
+    {w:'マ',key:'ma'},
+    {w:'ミ',key:'mi'},
+    {w:'ム',key:'mu'},
+    {w:'メ',key:'me'},
+    {w:'モ',key:'mo'},
+    {w:'ヤ',key:'ya'},
+    {w:'ユ',key:'yu'},
+    {w:'ヨ',key:'yo'},
+    {w:'ラ',key:'ra'},
+    {w:'リ',key:'ri'},
+    {w:'ル',key:'ru'},
+    {w:'レ',key:'re'},
+    {w:'ロ',key:'ro'},
+    {w:'ワ',key:'wa'},
+    {w:'オ',key:'o'},
+    {w:'ン',key:'n'}
+  ];
   const BASE_UP_WORDS = [
     {w:'が',key:'ga'},
     {w:'ぎ',key:'gi'},
@@ -74,11 +122,38 @@ const dataService = function(){
     {w:'ぺ',key:'pe'},
     {w:'ぽ',key:'po'}
   ];
+  const BASE_SECOND_UP_WORDS = [
+    {w:'ガ',key:'ga'},
+    {w:'ギ',key:'gi'},
+    {w:'グ',key:'gu'},
+    {w:'ゲ',key:'ge'},
+    {w:'ゴ',key:'go'},
+    {w:'ザ',key:'za'},
+    {w:'ジ',key:'zi'},
+    {w:'ズ',key:'zu'},
+    {w:'ゼ',key:'ze'},
+    {w:'ゾ',key:'zo'},
+    {w:'ダ',key:'da'},
+    {w:'ヂ',key:'di'},
+    {w:'ヅ',key:'du'},
+    {w:'デ',key:'de'},
+    {w:'ド',key:'do'},
+    {w:'バ',key:'ba'},
+    {w:'ビ',key:'bi'},
+    {w:'ブ',key:'bu'},
+    {w:'ベ',key:'be'},
+    {w:'ボ',key:'bo'},
+    {w:'パ',key:'pa'},
+    {w:'ピ',key:'pi'},
+    {w:'プ',key:'pu'},
+    {w:'ペ',key:'pe'},
+    {w:'ポ',key:'po'}
+  ];
   const FIRST = 'aiueokstnhmyrwngzdbp';
   const SECOND = 'aiueo';
   const FPS = 60;
   let width = 500;
-  let height = 400;
+  let height = 600;
   let hadRun = false;
   let words = [];
   let speed = 0.5;
@@ -87,12 +162,21 @@ const dataService = function(){
   let failWords = {};
   let keyInIds = [];
   let levelUp = false;
+  let secondWord = false;
 
   function generateWords(){
+    let wordStr = [];
     words = [];
-    let wordStr = BASE_WORDS.slice();
-    if(levelUp){
-      wordStr = wordStr.concat(BASE_UP_WORDS);
+    if(secondWord){
+      wordStr = BASE_SECOND_WORDS.slice();
+      if(levelUp){
+        wordStr = wordStr.concat(BASE_SECOND_UP_WORDS);
+      }
+    }else{
+      wordStr = BASE_WORDS.slice();
+      if(levelUp){
+        wordStr = wordStr.concat(BASE_UP_WORDS);
+      }
     }
     let interval = 0;
     for(let i=0;i<wordStr.length;i++){
@@ -165,6 +249,7 @@ const dataService = function(){
       }
     }
   }
+
   return {
     run: function(uiWidth,uiHeight) {
       if(hadRun){
@@ -176,10 +261,11 @@ const dataService = function(){
       generateWords();
       setInterval(updateData,1000/FPS);
     },
-    restartData:function(uiSpeed,uiLevelUp){
+    restartData:function(uiSpeed,uiLevelUp,uiSecondWord){
        words = [];
        speed = uiSpeed;
        levelUp = uiLevelUp;
+       secondWord = uiSecondWord;
        currentKeyIn = '';
        score = 0;
        failWords = {};
@@ -201,6 +287,9 @@ const dataService = function(){
     getKeyInIds:function(){
       return keyInIds;
     },
+    getFirstWord:function(){
+      return words.filter((word)=>dataService.getKeyInIds().indexOf(word.id)==-1)[0];
+    },
     updateKeyIn:updateKeyIn,
     checkKeyIn:checkKeyIn
   };
@@ -212,9 +301,11 @@ const uiController = function(dataService){
   const FPS = 60;
   const canvas = document.getElementsByClassName("mainCanvas")[0];
   const ctx = canvas.getContext('2d');
-  const failArea = document.getElementById("failWords");
   const speedUi = document.getElementById("speed");
   const levelUpUi =  document.getElementById("levelUp");
+  const secondWordUi = document.getElementById("secondWord");
+  const japaneseTable = document.getElementById("japanese-table");
+  const japaneseTableTds = japaneseTable.querySelectorAll("td");
   function printWords(){
     dataService.getWords().forEach((word)=>{
       printWord(word);
@@ -226,13 +317,27 @@ const uiController = function(dataService){
     ctx.fillText(word.word.w,word.x,word.y);
   }
   function printFailWords(){
-    let failStr = '';
     let failWords =  dataService.getFailWords();
     for(let key in failWords){
-      let word = failWords[key];
-      failStr+=word.w+'('+key+'),';
+      for(let i=0;i<japaneseTableTds.length;i++){
+        let td = japaneseTableTds[i];
+        let tdKey = td.getAttribute("key");
+        let style = td.getAttribute("style");
+        if(key==tdKey&&!style){
+          td.style = "background:#ff6d00"
+        }
+      }
     }
-    failArea.value = failStr;
+  }
+  function printFirstWord(){
+    let firstWord = dataService.getFirstWord();
+    for(let i=0;i<japaneseTableTds.length;i++){
+      let td = japaneseTableTds[i];
+      let tdKey = td.getAttribute("key");
+      if(tdKey&&firstWord.word.key==tdKey){
+        td.style = "background:orange";
+      }
+    }
   }
   function printScore(){
     ctx.font = "24pt Arial";
@@ -244,6 +349,17 @@ const uiController = function(dataService){
     ctx.fillStyle = "blue";
     ctx.fillText(dataService.getCurrentKeyIn(),canvas.width/2,50);
   }
+  function printTableWords(keyIn){
+    for(let i=0;i<japaneseTableTds.length;i++){
+      let td = japaneseTableTds[i];
+      let key = td.getAttribute("key");
+      if(key==keyIn){
+        td.style = "background:yellow"
+      }else{
+        td.style = "";
+      }
+    }
+  }
   function refresh(){
     clean();
     draw();
@@ -253,6 +369,7 @@ const uiController = function(dataService){
     printWords();
     printCurrentKeyIn();
     printFailWords();
+    printFirstWord();
   }
   function clean(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -261,11 +378,17 @@ const uiController = function(dataService){
     document.addEventListener('keydown',(event)=>{
         dataService.updateKeyIn(event.key);
         dataService.checkKeyIn();
+        printTableWords(dataService.getCurrentKeyIn());
     });
     document.getElementById('restart').addEventListener('click',()=>{
         let speed = parseFloat(speedUi.value);
         let levelUp = levelUpUi.checked;
-        dataService.restartData(speed,levelUp);
+        let secondWord = secondWordUi.checked;
+        dataService.restartData(speed,levelUp,secondWord);
+        for(let i=0;i<japaneseTableTds.length;i++){
+          let td = japaneseTableTds[i];
+          td.style = "";
+        }
     });
   }
   return {

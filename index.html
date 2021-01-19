@@ -1,19 +1,194 @@
 <html>
-  <head>
-    <title>五十音練習</title>
-  </head>
-  <body>
+
+<head>
+  <title>五十音練習</title>
+</head>
+<style>
+  #japanese-table {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 26px;
+  }
+
+  #japanese-table td,
+  #japanese-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  #japanese-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  #japanese-table tr:hover {
+    background-color: #ddd;
+  }
+
+  #japanese-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+  }
+</style>
+
+<body>
+  <div style="float:left;width:550px">
     <div>
       <label>speed</label><input type="number" id="speed" min="0.1" value="0.3"></input>
+      <label>片假名</label><input type="checkbox" id="secondWord"></input>
       <label>濁音</label><input type="checkbox" id="levelUp"></input>
       <input type="button" id="restart" value="restart"></input>
     </div>
     <div>
-      <canvas class="mainCanvas" width="500px" height="400px" style="border: 1px solid black;"></canvas>
+      <canvas class="mainCanvas" width="500px" height="600px" style="border: 1px solid black;"></canvas>
     </div>
-    <div>
-      <textarea id="failWords" style="width:500px;height:100px;color:red;"></textarea>
-    </div>
-  </body>
-  <script src="app.js"></script>
+  </div>
+  <div style="float:left">
+    <table id="japanese-table">
+      <thead>
+        <th></th>
+        <th>a</th>
+        <th>i</th>
+        <th>u</th>
+        <th>e</th>
+        <th>o</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td key="a">あ | ア</td>
+          <td key="i">い | イ</td>
+          <td key="u">う | ウ</td>
+          <td key="e">え | エ</td>
+          <td key="o">お | オ</td>
+        </tr>
+        <tr>
+          <td>k</td>
+          <td key="ka">か | カ</td>
+          <td key="ki">き | キ</td>
+          <td key="ku">く | ク</td>
+          <td key="ke">け | ケ</td>
+          <td key="ko">こ | コ</td>
+        </tr>
+        <tr>
+          <td>s</td>
+          <td key="sa">さ | サ</td>
+          <td key="si">し | シ</td>
+          <td key="su">す | ス</td>
+          <td key="se">せ | セ</td>
+          <td key="so">そ | ソ</td>
+        </tr>
+        <tr>
+          <td>t</td>
+          <td key="ta">た | タ</td>
+          <td key="ti">ち | チ</td>
+          <td key="tu">つ | ツ</td>
+          <td key="te">て | テ</td>
+          <td key="to">と | ト</td>
+        </tr>
+        <tr>
+          <td>n</td>
+          <td key="na">な | ナ</td>
+          <td key="ni">に | ニ</td>
+          <td key="nu">ぬ | ヌ</td>
+          <td key="ne">ね | ネ</td>
+          <td key="no">の | ノ</td>
+        </tr>
+        <tr>
+          <td>h</td>
+          <td key="ha">は | ハ</td>
+          <td key="hi">ひ | ヒ</td>
+          <td key="hu">ふ | フ</td>
+          <td key="he">へ | ヘ</td>
+          <td key="ho">ほ | ホ</td>
+        </tr>
+        <tr>
+          <td>m</td>
+          <td key="ma">ま | マ</td>
+          <td key="mi">み | ミ</td>
+          <td key="mu">む | ム</td>
+          <td key="me">め | メ</td>
+          <td key="mo">も | モ</td>
+        </tr>
+        <tr>
+          <td>y</td>
+          <td key="ya">や | ヤ</td>
+          <td></td>
+          <td key="yu">ゆ | ユ</td>
+          <td></td>
+          <td key="yo">よ | ヨ</td>
+        </tr>
+        <tr>
+          <td>r</td>
+          <td key="ra">ら | ラ</td>
+          <td key="ri">り | リ</td>
+          <td key="ru">る | ル</td>
+          <td key="re">れ | レ</td>
+          <td key="ro">ろ | ロ</td>
+        </tr>
+        <tr>
+          <td>w</td>
+          <td key="wa">わ | ワ</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td key="o">を | オ</td>
+        </tr>
+        <tr>
+          <td>n</td>
+          <td key="n">ん | ン</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>g</td>
+          <td key="ga">が | ガ</td>
+          <td key="gi">ぎ | ギ</td>
+          <td key="gu">ぐ | グ</td>
+          <td key="ge">げ | ゲ</td>
+          <td key="go">ご | ゴ</td>
+        </tr>
+        <tr>
+          <td>z</td>
+          <td key="za">ざ | ザ</td>
+          <td key="zi">じ | ジ</td>
+          <td key="zu">ず | ズ</td>
+          <td key="ze">ぜ | ゼ</td>
+          <td key="zo">ぞ | ゾ</td>
+        </tr>
+        <tr>
+          <td>d</td>
+          <td key="da">だ | ダ</td>
+          <td key="di">ぢ | ヂ</td>
+          <td key="du">づ | ヅ</td>
+          <td key="de">で | デ</td>
+          <td key="do">ど | ド</td>
+        </tr>
+        <tr>
+          <td>b</td>
+          <td key="ba">ば | バ</td>
+          <td key="bi">び | ビ</td>
+          <td key="bu">ぶ | ブ</td>
+          <td key="be">べ | ベ</td>
+          <td key="bo">ぼ | ボ</td>
+        </tr>
+        <tr>
+          <td>p</td>
+          <td key="pa">ぱ | パ</td>
+          <td key="pi">ぴ | ピ</td>
+          <td key="pu">ぷ | プ</td>
+          <td key="pe">ぺ | ペ</td>
+          <td key="po">ぽ | ポ</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+<script src="app.js"></script>
+
 </html>
